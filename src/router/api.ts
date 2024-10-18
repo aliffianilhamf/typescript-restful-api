@@ -7,3 +7,4 @@ apiRouter.use(authMiddleware);
 
 // user api
 apiRouter.get("/api/users/current", UserController.getUser);
+apiRouter.patch("/api/users/current", UserController.updateUser);

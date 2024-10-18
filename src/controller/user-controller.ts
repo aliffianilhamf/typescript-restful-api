@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateUserRequest } from "../model/user-model";
+import { CreateUserRequest, UpdateUserRequest } from "../model/user-model";
 import { UserSevice } from "../service/user-service";
 import { UserRequest } from "../type/user-request";
 
@@ -40,6 +40,22 @@ export class UserController {
     try {
       // kirim ke service
       const response = await UserSevice.getUser(req.user!);
+      //  kirim balikan ke client dalam bentuk json
+      res.status(200).json({
+        data: response,
+      });
+    } catch (error) {
+      // agar di midleware yang error bisa di tangkap
+      next(error);
+    }
+  }
+
+  static async updateUser(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      // buat body request menjadi CreateUserRequest
+      const request: UpdateUserRequest = req.body as UpdateUserRequest;
+      // kirim ke service
+      const response = await UserSevice.update(req.user!, request);
       //  kirim balikan ke client dalam bentuk json
       res.status(200).json({
         data: response,
