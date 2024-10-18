@@ -4,7 +4,10 @@
   "description": "this repo for document my learning backend with nodeJs, typescript",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc",
+    "start": "node dist/main.js"
+
   },
   "jest": {
     "transform": {

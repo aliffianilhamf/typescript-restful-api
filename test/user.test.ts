@@ -92,3 +92,34 @@ describe("POST /api/users/login", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("GET /api/users/current", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+
+  it("should get current user", async () => {
+    const response = await supertest(app)
+      .get("/api/users/current")
+      .set("X-API-TOKEN", "testing");
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.username).toBe("testing");
+    expect(response.body.data.name).toBe("testing");
+  });
+
+  it("should reject if token is wrong", async () => {
+    const response = await supertest(app)
+      .get("/api/users/current")
+      .set("X-API-TOKEN", "wrong");
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+});
