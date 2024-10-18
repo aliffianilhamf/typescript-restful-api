@@ -2,12 +2,14 @@ import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/respon-error";
 import {
   CreateUserRequest,
+  LoginUserRequest,
   toUserResponse,
   UserResponse,
 } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
 import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
 
 export class UserSevice {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -38,5 +40,48 @@ export class UserSevice {
     // balikan data user menjadi type model userResponse
 
     return toUserResponse(user);
+  }
+
+  static async login(request: LoginUserRequest): Promise<UserResponse> {
+    // validasi terlebih dahulu
+    const loginRequest = Validation.validate(UserValidation.LOGIN, request);
+
+    // cek username di database
+    let user = await prismaClient.user.findUnique({
+      where: {
+        username: loginRequest.username,
+      },
+    });
+
+    // jika user tidak ditemukan
+    if (!user) {
+      throw new ResponseError(400, "Username or password is wrong");
+    }
+
+    // cek password
+    const isPasswordMatch = await bcrypt.compare(
+      loginRequest.password,
+      user.password
+    );
+
+    // jika password tidak cocok
+    if (!isPasswordMatch) {
+      throw new ResponseError(400, "Username or password is wrong");
+    }
+
+    // update token
+    user = await prismaClient.user.update({
+      where: {
+        username: loginRequest.username,
+      },
+      data: {
+        token: uuid(),
+      },
+    });
+
+    // balikan data user menjadi type model userResponse
+    const response = toUserResponse(user);
+    response.token = user.token!;
+    return response;
   }
 }
