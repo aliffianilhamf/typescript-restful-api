@@ -65,4 +65,18 @@ export class UserController {
       next(error);
     }
   }
+
+  static async logout(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      // kirim ke service
+      const response = await UserSevice.logout(req.user!);
+      //  kirim balikan ke client dalam bentuk json
+      res.status(200).json({
+        data: "OK",
+      });
+    } catch (error) {
+      // agar di midleware yang error bisa di tangkap
+      next(error);
+    }
+  }
 }
