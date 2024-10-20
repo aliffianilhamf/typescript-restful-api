@@ -7,4 +7,12 @@ export class ContactValidation {
     email: z.string().email(),
     phone: z.string().min(5).max(20),
   });
+
+  static readonly UPDATE: ZodType = z.object({
+    id: z.number().positive(),
+    first_name: z.string().min(5).max(100).optional(),
+    last_name: z.string().min(5).max(100).optional(),
+    email: z.string().email().optional(),
+    phone: z.string().min(5).max(20).optional(),
+  });
 }
