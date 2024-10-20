@@ -142,3 +142,33 @@ describe("PUT /api/contacts/:contactId", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("DELETE /api/contacts/:contactId", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+  });
+  afterEach(async () => {
+    await ContactTest.delete();
+    await UserTest.delete();
+  });
+
+  it("should delete contact", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(app)
+      .delete(`/api/contacts/${contact.id}`)
+      .set("X-API-TOKEN", "testing");
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBe("OK");
+  });
+
+  it("should reject if contact not found", async () => {
+    const response = await supertest(app)
+      .delete(`/api/contacts/999`)
+      .set("X-API-TOKEN", "testing");
+    logger.debug(response.body);
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+});

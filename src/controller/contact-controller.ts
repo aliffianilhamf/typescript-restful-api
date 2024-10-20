@@ -44,4 +44,16 @@ export class ContactController {
       next(error);
     }
   }
+
+  static async delete(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const contactId = Number(req.params.contactId);
+      await ContactService.delete(req.user!, contactId);
+      res.status(200).json({
+        data: "OK",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

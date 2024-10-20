@@ -80,4 +80,21 @@ export class ContactService {
 
     return toContactResponse(contact);
   }
+
+  static async delete(user: User, id: number): Promise<ContactResponse> {
+    const contact = await this.checkContactMustExist(user.username, id);
+
+    if (!contact) {
+      throw new ResponseError(404, "Contact not found");
+    }
+
+    await prismaClient.contact.delete({
+      where: {
+        id: id,
+        username: user.username,
+      },
+    });
+
+    return toContactResponse(contact);
+  }
 }
