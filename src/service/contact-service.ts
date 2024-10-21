@@ -3,6 +3,7 @@ import { Validation } from "../validation/validation";
 import {
   ContactResponse,
   CreateContactRequest,
+  SearchContactRequest,
   toContactResponse,
   UpdateContactRequest,
 } from "../model/contact-model";
@@ -96,5 +97,76 @@ export class ContactService {
     });
 
     return toContactResponse(contact);
+  }
+
+  static async search(
+    user: User,
+    request: SearchContactRequest
+  ): Promise<Pageable<ContactResponse>> {
+    const searchRequest = Validation.validate(
+      ContactValidation.SEARCH,
+      request
+    );
+    const skip = (searchRequest.page - 1) * searchRequest.per_page;
+
+    const filters = [];
+    // cek if name exist
+    if (searchRequest.name) {
+      filters.push({
+        OR: [
+          {
+            first_name: {
+              contains: searchRequest.name,
+            },
+          },
+          {
+            last_name: {
+              contains: searchRequest.name,
+            },
+          },
+        ],
+      });
+    }
+    // cek if email exist
+    if (searchRequest.email) {
+      filters.push({
+        email: {
+          contains: searchRequest.email,
+        },
+      });
+    }
+    // cek if phone exist
+    if (searchRequest.phone) {
+      filters.push({
+        phone: {
+          contains: searchRequest.phone,
+        },
+      });
+    }
+
+    const contacts = await prismaClient.contact.findMany({
+      where: {
+        username: user.username,
+        AND: filters,
+      },
+      skip: skip,
+      take: searchRequest.per_page,
+    });
+
+    const total = await prismaClient.contact.count({
+      where: {
+        username: user.username,
+        AND: filters,
+      },
+    });
+
+    return {
+      data: contacts.map((contact) => toContactResponse(contact)),
+      pagging: {
+        page: searchRequest.page,
+        total_data: Math.ceil(contacts.length / searchRequest.per_page),
+        per_page: searchRequest.per_page,
+      },
+    };
   }
 }

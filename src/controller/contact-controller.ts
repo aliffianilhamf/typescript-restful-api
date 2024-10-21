@@ -3,6 +3,7 @@ import { ContactService } from "../service/contact-service";
 import {
   CreateContactRequest,
   UpdateContactRequest,
+  SearchContactRequest,
 } from "../model/contact-model";
 import { UserRequest } from "../type/user-request";
 
@@ -52,6 +53,22 @@ export class ContactController {
       res.status(200).json({
         data: "OK",
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async search(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const request: SearchContactRequest = {
+        name: req.query.name as string,
+        email: req.query.email as string,
+        phone: req.query.phone as string,
+        page: req.query.page ? Number(req.query.page) : 1,
+        per_page: req.query.per_page ? Number(req.query.per_page) : 1,
+      };
+      const response = await ContactService.search(req.user!, request);
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }

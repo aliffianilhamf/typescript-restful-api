@@ -172,3 +172,25 @@ describe("DELETE /api/contacts/:contactId", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("GET /api/contacts", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+  });
+  afterEach(async () => {
+    await ContactTest.delete();
+    await UserTest.delete();
+  });
+
+  it("should search contact", async () => {
+    const response = await supertest(app)
+      .get(`/api/contacts`)
+      .set("X-API-TOKEN", "testing");
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.pagging).toBe("Aliffian");
+  });
+});
