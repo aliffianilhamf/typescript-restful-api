@@ -65,7 +65,7 @@ export class ContactController {
         email: req.query.email as string,
         phone: req.query.phone as string,
         page: req.query.page ? Number(req.query.page) : 1,
-        per_page: req.query.per_page ? Number(req.query.per_page) : 1,
+        per_page: req.query.per_page ? Number(req.query.per_page) : 10,
       };
       const response = await ContactService.search(req.user!, request);
       res.status(200).json(response);

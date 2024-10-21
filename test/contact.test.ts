@@ -191,6 +191,8 @@ describe("GET /api/contacts", () => {
     logger.debug(response.body);
     expect(response.status).toBe(200);
     expect(response.body.data.length).toBe(1);
-    expect(response.body.pagging).toBe("Aliffian");
+    expect(response.body.paging.page).toBe(1);
+    expect(response.body.paging.per_page).toBe(10);
+    expect(response.body.paging.total_data).toBe(1);
   });
 });

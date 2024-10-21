@@ -6,5 +6,5 @@ type Paging = {
 
 type Pageable<T> = {
   data: Array<T>;
-  pagging: Paging;
+  paging: Paging;
 };

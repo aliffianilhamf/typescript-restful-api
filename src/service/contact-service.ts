@@ -162,9 +162,9 @@ export class ContactService {
 
     return {
       data: contacts.map((contact) => toContactResponse(contact)),
-      pagging: {
+      paging: {
         page: searchRequest.page,
-        total_data: Math.ceil(contacts.length / searchRequest.per_page),
+        total_data: Math.ceil(total / searchRequest.per_page),
         per_page: searchRequest.per_page,
       },
     };
